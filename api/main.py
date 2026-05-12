@@ -33,7 +33,12 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 async def lifespan(app: FastAPI):
     print("Starting application...")
 
-    await connect_db()
+    try:
+        await connect_db()
+        print("Database connected successfully.")
+    except Exception as e:
+        print(f"Database connection failed: {e}")
+        print("The app will continue running, but database features will be unavailable.")
 
     if not scheduler.running:
         scheduler.start()

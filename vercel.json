@@ -1,18 +1,22 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/main.py", "use": "@vercel/python" }
+    {
+      "src": "api/main.py",
+      "use": "@vercel/python"
+    }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/main.py" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/$1" }
+    {
+      "src": "/api/(.*)",
+      "dest": "api/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
   ],
   "env": {
-    "ENVIRONMENT": "production",
-    "MONGODB_URI": "@mongodb_uri",
-    "OPENROUTER_API_KEY": "@openrouter_api_key",
-    "SECRET_KEY": "@secret_key"
+    "ENVIRONMENT": "production"
   }
-
 }
