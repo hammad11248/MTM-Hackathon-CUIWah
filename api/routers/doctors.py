@@ -15,6 +15,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from api.database import get_db
+from api.limiter import limiter
 from api.models import (
     AISearchResult,
     DoctorCreate,
@@ -26,8 +27,7 @@ from api.models import (
 from api.services.recommender import SymptomRecommender
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
-recommender = SymptomRecommender()   # singleton — loads rule map once
+recommender = SymptomRecommender()   # singleton
 
 # ── Pakistani cities for location detection ───────────────────────────────────
 PAKISTAN_CITIES = {
@@ -117,7 +117,7 @@ async def search_doctors(
     # ── Step 1: Analyse symptoms ──────────────────────────────────────────────
     analysis = await recommender.analyse(q)          # always returns a result
     specializations: List[str] = analysis["specializations"]
-    urgency: UrgencyLevel = UrgencyLevel(analysis["urgency"])
+    urgency: UrgencyLevel = UrgencyLevel(analysis["urgency"].upper())
     home_advice: str = analysis["home_advice"]
     detected_location = _detect_location(q)
 

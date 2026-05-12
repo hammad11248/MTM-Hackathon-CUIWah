@@ -71,16 +71,79 @@
     <h2 class="text-lg font-bold text-slate-700 mb-4">📋 Registered Doctors</h2>
     <div id="doctorList" class="space-y-3"><p class="text-sm text-slate-400">Loading...</p></div>
   </div>
+
+  <!-- ── APPOINTMENT & SCHEDULING EFFICIENCY ─────────────────────────── -->
+  <div class="mt-10">
+    <h2 class="text-xl font-bold text-slate-800 mb-1">📅 Appointment & Scheduling Efficiency</h2>
+    <p class="text-sm text-slate-500 mb-5">View real-time slot availability, booked appointments, queue positions, and predicted wait times.</p>
+
+    <!-- Doctor Selector + Date -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-500 mb-1 block">Select Doctor</label>
+          <select id="schedDocSelect" class="input-field" onchange="loadScheduleView()">
+            <option value="">— Choose a doctor —</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-500 mb-1 block">Date</label>
+          <input id="schedDate" type="date" class="input-field" onchange="loadScheduleView()" />
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div id="schedStats" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div class="bg-sky-50 rounded-xl p-3 text-center">
+          <p class="text-2xl font-bold text-sky-700" id="statTotal">0</p>
+          <p class="text-xs text-slate-500">Total Slots</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-3 text-center">
+          <p class="text-2xl font-bold text-green-700" id="statFree">0</p>
+          <p class="text-xs text-slate-500">Free</p>
+        </div>
+        <div class="bg-orange-50 rounded-xl p-3 text-center">
+          <p class="text-2xl font-bold text-orange-700" id="statBooked">0</p>
+          <p class="text-xs text-slate-500">Booked</p>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-3 text-center">
+          <p class="text-2xl font-bold text-purple-700" id="statWait">—</p>
+          <p class="text-xs text-slate-500">Est. Wait (min)</p>
+        </div>
+      </div>
+
+      <!-- Slot Visual Grid -->
+      <div id="slotGrid" class="hidden">
+        <h3 class="text-sm font-bold text-slate-700 mb-2">🕐 Slot Availability</h3>
+        <div id="slotVisual" class="flex flex-wrap gap-2 mb-2"></div>
+        <div class="flex gap-4 text-xs text-slate-400 mt-1">
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-400 inline-block"></span> Free</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-400 inline-block"></span> Booked</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointments List -->
+    <div id="schedApptsWrap" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <h3 class="text-sm font-bold text-slate-700 mb-3">📋 Booked Appointments</h3>
+      <div id="schedApptsList" class="space-y-3">
+        <p class="text-sm text-slate-400">No appointments for this date.</p>
+      </div>
+    </div>
+  </div>
 </main>
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-full shadow-lg"></div>
 
+<!-- ── JAVASCRIPT ─────────────────────────────────────────────────────────── -->
+<script src="/js/app.js"></script>
+
 <script>
-const API_BASE="/api";
 const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const TIME_SLOTS=["09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"];
 const selectedSlots={};
 DAYS.forEach(d=>selectedSlots[d]=new Set());
+const AVG_CONSULT=15;
 
 function buildPicker(){
   const c=document.getElementById("availabilityPicker");c.innerHTML="";
@@ -103,26 +166,151 @@ document.getElementById("registerForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const p={name:document.getElementById("docName").value.trim(),specialization:document.getElementById("docSpec").value.trim(),location:document.getElementById("docLocation").value.trim(),consultation_type:document.getElementById("docConsultType").value,email:document.getElementById("docEmail").value.trim(),phone:document.getElementById("docPhone").value.trim(),experience_years:parseInt(document.getElementById("docExperience").value)||0,consultation_fee:parseInt(document.getElementById("docFee").value)||0,bio:document.getElementById("docBio").value.trim()||null,availability:getAvailability(),is_available:true,rating:0,total_reviews:0};
   try{
-    const r=await fetch(`${API_BASE}/doctors/`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
-    if(r.status===409){showToast("⚠️ Email already exists.");return}
-    if(r.status===422){const e=await r.json();showToast("❌ "+(e.detail?.[0]?.msg||"Validation error."));return}
-    if(!r.ok)throw new Error();
-    showToast("✅ Registered!");document.getElementById("registerForm").reset();DAYS.forEach(d=>selectedSlots[d].clear());document.querySelectorAll(".slot-btn").forEach(b=>b.classList.remove("active"));loadDoctors();
-  }catch{showToast("Registration failed.")}
+    await apiFetch(`${API_BASE}/doctors/`,{method:"POST",body:JSON.stringify(p)});
+    showToast("✅ Registered!");
+    document.getElementById("registerForm").reset();
+    DAYS.forEach(d=>selectedSlots[d].clear());
+    document.querySelectorAll(".slot-btn").forEach(b=>b.classList.remove("active"));
+    loadDoctors();
+  }catch(err){
+    if(err.status===409) showToast("⚠️ Email already exists.");
+    else if(err.status===422) showToast("❌ Validation error.");
+    else showToast("Registration failed.");
+  }
 });
 
+let allDoctors=[];
 async function loadDoctors(){
   const c=document.getElementById("doctorList");
   try{
-    const r=await fetch(`${API_BASE}/doctors/?limit=50`);if(!r.ok)throw new Error();const docs=await r.json();
-    if(!docs.length){c.innerHTML='<p class="text-sm text-slate-400">No doctors registered yet.</p>';return}
-    c.innerHTML=docs.map(d=>`<div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 text-sm">${esc(d.name)}</h3><p class="text-xs text-sky-600">${esc(d.specialization)} — ${esc(d.location)}</p></div><div class="text-right shrink-0"><span class="${d.is_available?'bg-green-100 text-green-700':'bg-red-100 text-red-600'} text-xs font-semibold px-2 py-0.5 rounded-full">${d.is_available?'Available':'Unavailable'}</span><p class="text-xs text-slate-400 mt-1">Rs. ${d.consultation_fee?.toLocaleString()}</p></div></div>`).join("");
+    allDoctors = await apiFetch(`${API_BASE}/doctors/?limit=50`);
+    if(!allDoctors.length){c.innerHTML='<p class="text-sm text-slate-400">No doctors registered yet.</p>';return}
+    c.innerHTML=allDoctors.map(d=>{
+      const id=d._id||d.id;
+      return `<div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between gap-3">
+        <div class="flex-1 min-w-0">
+          <h3 class="font-bold text-slate-800 text-sm">${esc(d.name)}</h3>
+          <p class="text-xs text-sky-600">${esc(d.specialization)} — ${esc(d.location)}</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="/doctor-profile.html?id=${id}" class="text-xs px-3 py-1 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors font-medium">💬 Profile & Chat</a>
+          <span class="${d.is_available?'bg-green-100 text-green-700':'bg-red-100 text-red-600'} text-xs font-semibold px-2 py-0.5 rounded-full">${d.is_available?'Available':'Unavailable'}</span>
+        </div>
+      </div>`
+    }).join("");
+    populateDoctorDropdown();
   }catch{c.innerHTML='<p class="text-sm text-red-400">Failed to load.</p>'}
 }
 
-function showToast(m,d=3500){const t=document.getElementById("toast");t.textContent=m;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),d)}
-function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function populateDoctorDropdown(){
+  const sel=document.getElementById("schedDocSelect");
+  sel.innerHTML='<option value="">— Choose a doctor —</option>';
+  allDoctors.forEach(d=>{
+    const id=d._id||d.id;
+    sel.innerHTML+=`<option value="${id}">${esc(d.name)} — ${esc(d.specialization)}</option>`;
+  });
+}
 
+async function loadScheduleView(){
+  const docId=document.getElementById("schedDocSelect").value;
+  const date=document.getElementById("schedDate").value;
+  if(!docId||!date)return;
+
+  try{
+    const data = await apiFetch(`${API_BASE}/appointments/available-slots/${docId}?date=${date}`);
+    renderSlotGrid(data);
+
+    const appts = await apiFetch(`${API_BASE}/appointments/doctor/${docId}?date=${date}`);
+    renderAppointments(appts,data);
+  }catch(err){
+    console.error(err);
+    showToast("Failed to load schedule.");
+  }
+}
+
+function renderSlotGrid(data){
+  const statsEl=document.getElementById("schedStats");
+  const gridEl=document.getElementById("slotGrid");
+  const visualEl=document.getElementById("slotVisual");
+  statsEl.classList.remove("hidden");
+  gridEl.classList.remove("hidden");
+
+  const total=data.all_slots.length;
+  const booked=data.booked_slots.length;
+  const free=data.free_slots.length;
+  const wait=booked*AVG_CONSULT;
+
+  document.getElementById("statTotal").textContent=total;
+  document.getElementById("statFree").textContent=free;
+  document.getElementById("statBooked").textContent=booked;
+  document.getElementById("statWait").textContent=booked>0?wait+"m":"0m";
+
+  visualEl.innerHTML="";
+  if(total===0){
+    visualEl.innerHTML=`<p class="text-sm text-slate-400">No slots configured for ${data.day}.</p>`;
+    return;
+  }
+  data.all_slots.forEach(slot=>{
+    const isBooked=data.booked_slots.includes(slot);
+    const el=document.createElement("div");
+    el.className=`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-default transition-all ${isBooked?"bg-red-100 text-red-700 border border-red-200":"bg-green-100 text-green-700 border border-green-200"}`;
+    el.textContent=slot+(isBooked?" ✗":" ✓");
+    el.title=isBooked?"Booked":"Available";
+    visualEl.appendChild(el);
+  });
+}
+
+function renderAppointments(appts,slotData){
+  const wrap=document.getElementById("schedApptsWrap");
+  const list=document.getElementById("schedApptsList");
+  wrap.classList.remove("hidden");
+
+  if(!appts.length){
+    list.innerHTML='<p class="text-sm text-slate-400">No appointments booked for this date yet.</p>';
+    return;
+  }
+
+  const statusColors={confirmed:"bg-green-100 text-green-700",pending:"bg-yellow-100 text-yellow-700",cancelled:"bg-red-100 text-red-600",completed:"bg-sky-100 text-sky-700"};
+
+  list.innerHTML=appts.map((a,i)=>{
+    const id=a._id||a.id;
+    const wait=a.predicted_wait_minutes!=null?a.predicted_wait_minutes:i*AVG_CONSULT;
+    return `
+    <div class="border border-slate-200 rounded-xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h4 class="font-bold text-slate-800 text-sm">${esc(a.patient_name)}</h4>
+          <p class="text-xs text-slate-500">${esc(a.patient_email)} · ${esc(a.patient_contact)}</p>
+        </div>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${statusColors[a.status]||'bg-slate-100 text-slate-600'}">${a.status}</span>
+      </div>
+      <div class="flex flex-wrap gap-3 text-xs text-slate-500 mb-3">
+        <span>🕐 ${esc(a.time_slot)}</span>
+        <span>🏥 ${esc(a.consultation_type)}</span>
+        <span>📊 Queue #${a.queue_position||i+1}</span>
+        <span>⏳ ~${wait} min wait</span>
+      </div>
+      ${a.symptoms?`<p class="text-xs text-slate-400 mb-3">💬 "${esc(a.symptoms)}"</p>`:""}
+      <div class="flex gap-2">
+        ${a.status!=="completed"?`<button onclick="updateApptStatus('${id}','completed')" class="text-xs px-3 py-1 rounded-lg bg-sky-100 text-sky-700 hover:bg-sky-200 transition-colors">✓ Complete</button>`:""}
+        ${a.status!=="cancelled"?`<button onclick="updateApptStatus('${id}','cancelled')" class="text-xs px-3 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">✗ Cancel</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function updateApptStatus(apptId,newStatus){
+  try{
+    await apiFetch(`${API_BASE}/appointments/${apptId}/status`,{method:"PATCH",body:JSON.stringify({status:newStatus})});
+    showToast(`✅ Appointment ${newStatus}!`);
+    loadScheduleView();
+  }catch{showToast("Failed to update status.")}
+}
+
+// ── Init ─────────────────────────────────────────────────────────────
+const today=getTodayStr();
+document.getElementById("schedDate").value=today;
+document.getElementById("schedDate").min=today;
 buildPicker();loadDoctors();
 </script>
 </body>

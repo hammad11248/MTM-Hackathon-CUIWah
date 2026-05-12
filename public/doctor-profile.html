@@ -39,10 +39,8 @@
         <h1 id="profileName" class="text-xl font-bold text-slate-800">Loading...</h1>
         <p id="profileSpec" class="text-sky-600 font-medium text-sm"></p>
         <div class="flex flex-wrap gap-3 mt-2 text-xs text-slate-500">
-          <span id="profileLocation"></span>
-          <span id="profileType"></span>
-          <span id="profileFee"></span>
           <span id="profileExp"></span>
+          <span id="profilePhone"></span>
         </div>
         <p id="profileBio" class="text-sm text-slate-600 mt-3"></p>
         <div class="flex items-center gap-2 mt-2">
@@ -92,10 +90,11 @@
   </div>
 </main>
 
-<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-full shadow-lg"></div>
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-<!-- ── JAVASCRIPT ─────────────────────────────────────────────────────────── -->
+<script src="/js/app.js"></script>
+<script src="/js/chat.js"></script>
 
 <script>
-const API_BASE="/api";
 const params=new URLSearchParams(window.location.search);
 const doctorId=params.get("id");
 let doctorData=null;
@@ -103,8 +102,7 @@ let doctorData=null;
 async function loadProfile(){
   if(!doctorId){document.getElementById("profileName").textContent="No doctor ID provided.";return}
   try{
-    const r=await fetch(`${API_BASE}/doctors/${doctorId}`);if(!r.ok)throw new Error();
-    doctorData=await r.json();
+    doctorData = await apiFetch(`${API_BASE}/doctors/${doctorId}`);
     document.title=`${doctorData.name} — Smart Doctor Connect AI`;
     document.getElementById("profileName").textContent=doctorData.name;
     document.getElementById("profileSpec").textContent=doctorData.specialization;
@@ -112,17 +110,24 @@ async function loadProfile(){
     document.getElementById("profileType").textContent="🏥 "+doctorData.consultation_type;
     document.getElementById("profileFee").textContent="💰 Rs. "+(doctorData.consultation_fee?.toLocaleString()??"—");
     document.getElementById("profileExp").textContent="🎓 "+doctorData.experience_years+" yrs";
+    document.getElementById("profilePhone").textContent="📞 "+(doctorData.phone||"—");
     document.getElementById("profileBio").textContent=doctorData.bio||"";
+    
     const stars="★".repeat(Math.round(doctorData.rating||0))+"☆".repeat(5-Math.round(doctorData.rating||0));
     document.getElementById("profileRating").textContent=stars;
     document.getElementById("profileReviews").textContent=`${doctorData.rating?.toFixed(1)} (${doctorData.total_reviews} reviews)`;
+    
     const badge=document.getElementById("profileAvailBadge");
     badge.textContent=doctorData.is_available?"Available":"Unavailable";
     badge.className=`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 ${doctorData.is_available?"bg-green-100 text-green-700":"bg-red-100 text-red-600"}`;
+    
     renderSchedule(doctorData.availability||{});
     setupBookingDate();
-    loadChatHistory();
-  }catch{document.getElementById("profileName").textContent="Doctor not found."}
+    initChat(doctorId);
+  }catch(err){
+    console.error(err);
+    document.getElementById("profileName").textContent="Doctor not found.";
+  }
 }
 
 function renderSchedule(avail){
@@ -140,14 +145,14 @@ function renderSchedule(avail){
 }
 
 function setupBookingDate(){
-  const today=new Date().toISOString().split("T")[0];
+  const today=getTodayStr();
   const d=document.getElementById("qbDate");d.min=today;d.value=today;
   d.onchange=()=>updateSlots(d.value);
   updateSlots(today);
 }
 
 function updateSlots(dateStr){
-  const day=new Date(dateStr+"T00:00:00").toLocaleDateString("en-US",{weekday:"long"});
+  const day=getDayName(dateStr);
   const slots=(doctorData?.availability||{})[day]||[];
   const sel=document.getElementById("qbSlot");
   sel.innerHTML=slots.length?slots.map(s=>`<option value="${s}">${s}</option>`).join(""):`<option value="">No slots for ${day}</option>`;
@@ -163,48 +168,23 @@ async function quickBook(){
   const symptoms=document.getElementById("qbSymptoms").value.trim();
   if(!name||!contact||!email||!date||!slot){showToast("Fill all required fields.");return}
   try{
-    const r=await fetch(`${API_BASE}/appointments/`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({doctor_id:doctorId,doctor_name:doctorData?.name||"",patient_name:name,patient_contact:contact,patient_email:email,date,time_slot:slot,consultation_type:type,symptoms})});
+    const r = await fetch(`${API_BASE}/appointments/`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({doctor_id:doctorId,doctor_name:doctorData?.name||"",patient_name:name,patient_contact:contact,patient_email:email,date,time_slot:slot,consultation_type:type,symptoms})
+    });
     if(r.status===409){showToast("⚠️ Slot already booked.");return}
     if(!r.ok)throw new Error();
-    showToast("✅ Appointment booked!");
+    const data = await r.json();
+    showToast(`✅ Booked! Queue #${data.queue_position}`);
   }catch{showToast("Booking failed.")}
 }
 
-async function sendMessage(){
-  const name=document.getElementById("chatName").value.trim();
-  const contact=document.getElementById("chatContact").value.trim();
-  const msg=document.getElementById("chatMessage").value.trim();
-  if(!name||!msg){showToast("Name and message required.");return}
-  addChatBubble(msg,"patient",name);
-  document.getElementById("chatMessage").value="";
-  try{
-    const r=await fetch(`${API_BASE}/chat/message`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({doctor_id:doctorId,patient_name:name,patient_contact:contact||null,message:msg})});
-    if(!r.ok)throw new Error();
-    const data=await r.json();
-    addChatBubble(data.ai_response,"ai","AI Receptionist");
-  }catch{addChatBubble("Sorry, something went wrong. Please try again.","ai","System")}
+// Re-map sendMessage to the one in chat.js
+function sendMessage() {
+  sendChatMessage();
 }
 
-async function loadChatHistory(){
-  try{
-    const r=await fetch(`${API_BASE}/chat/history/${doctorId}?limit=20`);if(!r.ok)return;
-    const msgs=await r.json();
-    msgs.forEach(m=>{addChatBubble(m.message,"patient",m.patient_name);addChatBubble(m.ai_response,"ai","AI Receptionist")});
-  }catch{}
-}
-
-function addChatBubble(text,type,sender){
-  const c=document.getElementById("chatMessages");
-  const div=document.createElement("div");
-  div.className=`chat-bubble ${type==="patient"?"chat-patient":"chat-ai"}`;
-  div.innerHTML=`<p class="text-xs font-semibold opacity-60 mb-0.5">${esc(sender)}</p><p>${esc(text)}</p>`;
-  c.appendChild(div);c.scrollTop=c.scrollHeight;
-}
-
-function showToast(m,d=3500){const t=document.getElementById("toast");t.textContent=m;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),d)}
-function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-
-document.getElementById("chatMessage").addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage()});
 loadProfile();
 </script>
 </body>
