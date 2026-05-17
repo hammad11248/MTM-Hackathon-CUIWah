@@ -26,7 +26,7 @@ async def send_doctor_notification(
     Notify a doctor about a new patient message.
     Logs the email to MongoDB and prints to console (simulated).
     """
-    db = get_db()
+    db = await get_db()
 
     email_record = {
         "type": "doctor_notification",
@@ -84,7 +84,7 @@ async def send_appointment_confirmation(
     Send appointment confirmation email to the patient.
     Logs to MongoDB and prints to console (simulated).
     """
-    db = get_db()
+    db = await get_db()
 
     wait_info = f"Estimated wait: ~{predicted_wait} minutes" if predicted_wait else "You are next in queue"
 
@@ -136,7 +136,7 @@ async def send_followup_reminder(
     """
     Send a follow-up reminder to the patient (scheduled via APScheduler).
     """
-    db = get_db()
+    db = await get_db()
 
     email_record = {
         "type": "followup_reminder",

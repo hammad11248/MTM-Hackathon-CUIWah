@@ -24,7 +24,7 @@ async def match_doctor_agent(payload: AgentMatchRequest):
     Takes a finalized triage summary, extracts specialties via LLM, 
     and queries MongoDB to find the top 2 best matches.
     """
-    db = get_db()
+    db = await get_db()
     llm = recommender._get_llm()
     
     specializations = []

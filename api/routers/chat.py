@@ -51,7 +51,7 @@ def _msg_to_response(doc: dict) -> MessageInDB:
     summary="Send a message to a doctor (AI responds if offline)",
 )
 async def send_message(payload: MessageCreate):
-    db = get_db()
+    db = await get_db()
 
     # Verify doctor exists
     try:
@@ -115,7 +115,7 @@ async def send_message(payload: MessageCreate):
     summary="Get chat history for a doctor",
 )
 async def get_chat_history(doctor_id: str, limit: int = 50):
-    db = get_db()
+    db = await get_db()
 
     # Verify doctor exists
     try:
@@ -222,7 +222,7 @@ def _doc_to_response(doc: dict, match_score: Optional[int] = None) -> DoctorResp
     summary="Interactive home page symptom triage chat assistant",
 )
 async def triage_message(payload: TriageMessageCreate):
-    db = get_db()
+    db = await get_db()
     
     # 1. Analyse symptoms using recommender
     analysis = await recommender.analyse(payload.message)
@@ -317,7 +317,7 @@ Do NOT write any JSON or markdown formatting, write plain text only."""
     summary="Generate a 3-bullet AI summary of the chat and link to appointment",
 )
 async def generate_chat_summary(payload: ChatSummaryRequest):
-    db = get_db()
+    db = await get_db()
     
     # 1. Format conversation history
     convo_text = ""

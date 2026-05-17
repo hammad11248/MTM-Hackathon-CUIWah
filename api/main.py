@@ -46,8 +46,10 @@ async def lifespan(app: FastAPI):
         print(f"Database connection failed: {e}")
         print("The app will continue running, but database features will be unavailable.")
 
-    if not scheduler.running:
-        scheduler.start()
+    # APScheduler is only supported in long-running processes (not Vercel serverless)
+    if ENVIRONMENT == "development":
+        if not scheduler.running:
+            scheduler.start()
 
     yield
 
@@ -55,7 +57,7 @@ async def lifespan(app: FastAPI):
 
     await close_db()
 
-    if scheduler.running:
+    if ENVIRONMENT == "development" and scheduler.running:
         scheduler.shutdown()
 
 
@@ -128,13 +130,14 @@ async def health_check():
 
 # ─────────────────────────────────────────────────────────────
 # Static Files
+# On Vercel, static files are served by @vercel/static via routes.
+# In development, FastAPI serves them directly.
 # ─────────────────────────────────────────────────────────────
 if ENVIRONMENT == "development":
-    app.mount(
-        "/",
-        StaticFiles(directory="public", html=True),
-        name="static"
-    )
+    import os as _os
+    _public_dir = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "public")
+    if _os.path.isdir(_public_dir):
+        app.mount("/", StaticFiles(directory=_public_dir, html=True), name="static")
 
 # ─────────────────────────────────────────────────────────────
 # Direct Execution Support

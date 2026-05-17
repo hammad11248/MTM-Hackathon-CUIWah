@@ -39,7 +39,7 @@ def _appt_to_response(doc: dict) -> AppointmentInDB:
     summary="Book a new appointment",
 )
 async def book_appointment(payload: AppointmentCreate):
-    db = get_db()
+    db = await get_db()
 
     # Verify doctor exists
     try:
@@ -103,7 +103,7 @@ async def get_available_slots(
     doctor_id: str,
     date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$", description="Date in YYYY-MM-DD format"),
 ):
-    db = get_db()
+    db = await get_db()
 
     # Fetch doctor to get their full availability
     try:
@@ -165,7 +165,7 @@ async def update_appointment_status(
     appointment_id: str,
     payload: AppointmentStatusUpdate,
 ):
-    db = get_db()
+    db = await get_db()
 
     try:
         oid = ObjectId(appointment_id)
@@ -195,7 +195,7 @@ async def get_doctor_appointments(
     date: str = Query(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
     status_filter: str = Query(default=None, alias="status"),
 ):
-    db = get_db()
+    db = await get_db()
 
     query = {"doctor_id": doctor_id}
     if date:
@@ -217,7 +217,7 @@ async def get_doctor_appointments(
 async def get_patient_appointments(
     email: str = Query(..., description="Patient email address"),
 ):
-    db = get_db()
+    db = await get_db()
     cursor = db.appointments.find({"patient_email": email}).sort("date", -1)
     docs = await cursor.to_list(length=100)
     return [_appt_to_response(d) for d in docs]

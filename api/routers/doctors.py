@@ -84,7 +84,7 @@ def _doc_to_response(doc: dict, match_score: Optional[int] = None) -> DoctorResp
     summary="Register a new doctor",
 )
 async def register_doctor(payload: DoctorCreate):
-    db = get_db()
+    db = await get_db()
 
     # Prevent duplicate email registrations
     existing = await db.doctors.find_one({"email": payload.email})
@@ -112,7 +112,7 @@ async def search_doctors(
     q: str = Query(..., min_length=3, max_length=500, description="Patient symptoms or free-text query"),
     limit: int = Query(default=6, ge=1, le=20),
 ):
-    db = get_db()
+    db = await get_db()
 
     # ── Step 1: Analyse symptoms ──────────────────────────────────────────────
     analysis = await recommender.analyse(q)          # always returns a result
@@ -168,7 +168,7 @@ async def search_doctors(
 # ── Get Doctor by ID ──────────────────────────────────────────────────────────
 @router.get("/{doctor_id}", response_model=DoctorResponse, summary="Fetch a doctor profile")
 async def get_doctor(doctor_id: str):
-    db = get_db()
+    db = await get_db()
     try:
         oid = ObjectId(doctor_id)
     except Exception:
@@ -183,7 +183,7 @@ async def get_doctor(doctor_id: str):
 # ── Update Doctor ─────────────────────────────────────────────────────────────
 @router.put("/{doctor_id}", response_model=DoctorResponse, summary="Update doctor profile")
 async def update_doctor(doctor_id: str, payload: DoctorUpdate):
-    db = get_db()
+    db = await get_db()
     try:
         oid = ObjectId(doctor_id)
     except Exception:
@@ -207,7 +207,7 @@ async def list_doctors(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ):
-    db = get_db()
+    db = await get_db()
     cursor = db.doctors.find().skip(skip).limit(limit)
     docs = await cursor.to_list(length=limit)
     return [_doc_to_response(d) for d in docs]

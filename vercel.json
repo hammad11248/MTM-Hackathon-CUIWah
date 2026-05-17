@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "api/main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     },
     {
       "src": "public/**",
@@ -24,27 +27,44 @@
       "dest": "/public/js/$1"
     },
     {
-      "src": "/doctor-dashboard.html",
+      "src": "/(.*\\.(ico|png|jpg|jpeg|svg|webp|gif|woff|woff2|ttf|otf|css|js))",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/doctor-dashboard\\.html",
       "dest": "/public/doctor-dashboard.html"
     },
     {
-      "src": "/doctor-profile.html",
+      "src": "/doctor-profile\\.html",
       "dest": "/public/doctor-profile.html"
     },
     {
-      "src": "/(.*\\.html)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/(.*\\.ico|.*\\.png|.*\\.jpg|.*\\.svg|.*\\.webp)",
-      "dest": "/public/$1"
+      "src": "/",
+      "dest": "/public/index.html"
     },
     {
       "src": "/(.*)",
       "dest": "/public/$1"
     }
   ],
-  "env": {
-    "ENVIRONMENT": "production"
-  }
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
 }
