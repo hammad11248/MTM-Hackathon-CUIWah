@@ -3,189 +3,459 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Doctor Profile — Smart Doctor Connect AI</title>
+  <title>Physician Profile Detail — Smart Doctor Connect AI</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
   <style>
-    .input-field{width:100%;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.6rem 0.85rem;font-size:0.875rem;outline:none;color:#1e293b;transition:border-color 0.15s}
-    .input-field:focus{border-color:#0ea5e9}
-    #toast{transition:opacity 0.3s,transform 0.3s}
-    #toast.hidden{opacity:0;transform:translateY(20px);pointer-events:none}
-    .chat-bubble{max-width:80%;padding:0.6rem 1rem;border-radius:1rem;font-size:0.875rem;line-height:1.4}
-    .chat-patient{background:#e0f2fe;color:#0c4a6e;border-bottom-left-radius:0.25rem;align-self:flex-start}
-    .chat-ai{background:#f0fdf4;color:#14532d;border-bottom-right-radius:0.25rem;align-self:flex-end}
+    :root {
+      --primary: #06b6d4;       /* Neon Cyan */
+      --secondary: #8b5cf6;     /* Neon Violet */
+      --accent: #ec4899;        /* Electric Magenta */
+      --obsidian: #090b11;      /* Deep Space Obsidian */
+    }
+
+    body {
+      background-color: var(--obsidian);
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 45px 45px, 45px 45px;
+    }
+
+    /* Ambient glows */
+    .ambient-glow {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.45;
+    }
+
+    /* Cyber Glass Cards */
+    .cyber-card {
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.6), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cyber-header {
+      background: rgba(9, 11, 17, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .input-field {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.775rem;
+      font-weight: 600;
+      outline: none;
+      color: #f1f5f9;
+      background-color: rgba(9, 11, 17, 0.6);
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      border-color: rgba(6, 182, 212, 0.4);
+      background-color: rgba(9, 11, 17, 0.8);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+    }
+
+    .btn-premium {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      box-shadow: 0 4px 20px -3px rgba(6, 182, 212, 0.35),
+                  0 2px 8px -1px rgba(6, 182, 212, 0.2);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-premium:hover {
+      box-shadow: 0 8px 30px -3px rgba(6, 182, 212, 0.5),
+                  0 4px 12px -1px rgba(6, 182, 212, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .pulse-ring {
+      position: relative;
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: inherit;
+      opacity: 0.6;
+      animation: pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+<body class="text-slate-200 antialiased min-h-screen relative overflow-x-hidden">
+  
+  <!-- Ambient glows -->
+  <div class="ambient-glow w-[500px] h-[500px] bg-violet-600/10 -top-40 -left-40"></div>
+  <div class="ambient-glow w-[600px] h-[600px] bg-cyan-500/10 top-1/2 -right-40"></div>
 
-<header class="bg-white shadow-sm sticky top-0 z-40">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2">
-      <span class="text-2xl">🏥</span>
-      <span class="font-bold text-lg text-sky-700">Smart Doctor<span class="text-slate-500 font-normal"> Connect</span></span>
-    </a>
-    <nav class="flex gap-4 items-center text-sm">
-      <a href="/index.html" class="text-slate-500 hover:text-sky-600">Find Doctor</a>
-      <a href="/doctor-dashboard.html" class="text-slate-500 hover:text-sky-600">For Doctors</a>
-    </nav>
-  </div>
-</header>
-
-<main class="max-w-4xl mx-auto px-4 py-8">
-  <!-- Doctor Profile Card -->
-  <div id="profileCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
-    <div class="flex items-start gap-4">
-      <div class="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-3xl shrink-0">👨‍⚕️</div>
-      <div class="flex-1">
-        <h1 id="profileName" class="text-xl font-bold text-slate-800">Loading...</h1>
-        <p id="profileSpec" class="text-sky-600 font-medium text-sm"></p>
-        <div class="flex flex-wrap gap-3 mt-2 text-xs text-slate-500">
-          <span id="profileExp"></span>
-          <span id="profilePhone"></span>
+  <!-- ── NAV HEADER ──────────────────────────────────────────────────────────── -->
+  <header class="cyber-header sticky top-0 z-40 border-b border-white/5 shadow-xl">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-12 h-12 rounded-[1.2rem] rounded-tr-md bg-gradient-to-tr from-cyan-500 via-violet-600 to-pink-500 flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 duration-300">
+          <span class="text-white text-2xl select-none">🏥</span>
         </div>
-        <p id="profileBio" class="text-sm text-slate-600 mt-3"></p>
-        <div class="flex items-center gap-2 mt-2">
-          <span id="profileRating" class="text-yellow-400 text-sm"></span>
-          <span id="profileReviews" class="text-xs text-slate-400"></span>
-          <span id="profileAvailBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full ml-2"></span>
+        <div>
+          <span class="font-display font-extrabold text-xl text-white leading-tight block tracking-tight">Smart Doctor</span>
+          <span class="text-cyan-400 font-black text-[10px] block tracking-[0.25em] uppercase -mt-0.5">Connect AI</span>
+        </div>
+      </a>
+      
+      <nav class="flex items-center gap-3 text-sm font-bold">
+        <a href="/index.html" class="px-4 py-2.5 rounded-2xl text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 hover:bg-slate-900/50">
+          <span>🔍</span> Find Doctor
+        </a>
+        <a href="/doctor-dashboard.html" class="px-4 py-2.5 rounded-2xl text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 hover:bg-slate-900/50">
+          <span>👨‍⚕️</span> For Doctors
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── MAIN CONTAINER ───────────────────────────────────────────────────────── -->
+  <main class="max-w-5xl mx-auto px-6 py-12 relative z-10 font-sans">
+    
+    <!-- Breadcrumb -->
+    <div class="mb-6 text-[9px] font-black text-slate-500 tracking-widest uppercase">
+      <a href="/" class="hover:text-cyan-400 transition-colors">Home</a> &nbsp;•&nbsp; 
+      <span class="text-slate-400">Node Profile Detail</span>
+    </div>
+
+    <!-- Doctor Profile Card -->
+    <div id="profileCard" class="cyber-card rounded-[2.2rem] rounded-tr-md p-6 shadow-2xl mb-8 border border-white/10">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div class="w-24 h-24 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center text-5xl shadow-md shrink-0 select-none">👨‍⚕️</div>
+        
+        <div class="flex-1 space-y-2.5">
+          <div class="flex flex-wrap items-center gap-3">
+            <h1 id="profileName" class="font-display text-2xl sm:text-3xl font-extrabold text-white leading-tight tracking-tight">Loading Profile...</h1>
+            <span id="profileAvailBadge" class="text-[9px] font-black px-3.5 py-1.5 rounded-full uppercase shadow-sm border border-cyan-500/20 bg-cyan-950/40 text-cyan-400">Available</span>
+          </div>
+          
+          <p id="profileSpec" class="text-xs font-black text-cyan-400 uppercase tracking-widest"></p>
+          
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-slate-400 font-semibold pt-1">
+            <span id="profileLocation">📍 Loading...</span>
+            <span id="profileType">🏥 Loading...</span>
+            <span id="profileExp">🎓 Loading...</span>
+            <span id="profilePhone">📞 Loading...</span>
+            <span id="profileFee" class="text-cyan-450 font-extrabold bg-cyan-950/40 px-3 py-1 rounded-lg border border-cyan-500/20">💰 Loading...</span>
+          </div>
+
+          <p id="profileBio" class="text-xs text-slate-400 leading-relaxed max-w-3xl pt-2 font-medium"></p>
+          
+          <div class="flex items-center gap-2 pt-3 border-t border-white/5 mt-2">
+            <span id="profileRating" class="text-yellow-400 text-sm">★★★★★</span>
+            <span id="profileReviews" class="text-xs font-extrabold text-slate-450">4.5 (200 reviews)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Availabilities Grid -->
+      <div class="mt-8 border-t border-white/5 pt-6">
+        <h3 class="font-display text-xs font-black text-slate-350 mb-4 flex items-center gap-2 uppercase tracking-wide">
+          <span>📅</span> Weekly Clinical Schedule
+        </h3>
+        <div id="availSchedule" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
+          <!-- Calendar populated dynamically -->
         </div>
       </div>
     </div>
-    <!-- Availability Schedule -->
-    <div class="mt-6">
-      <h3 class="text-sm font-bold text-slate-700 mb-2">📅 Availability</h3>
-      <div id="availSchedule" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs"></div>
-    </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Chat Section -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">💬 AI Receptionist Chat</h2>
-      <p class="text-xs text-slate-400 mb-3">Send a message — our AI will respond on behalf of the doctor if they're offline.</p>
-      <div id="chatMessages" class="flex flex-col gap-2 max-h-72 overflow-y-auto mb-3 p-2 bg-slate-50 rounded-xl"></div>
-      <div class="space-y-2">
-        <input id="chatName" type="text" placeholder="Your name *" class="input-field" />
-        <input id="chatContact" type="tel" placeholder="Phone (optional)" class="input-field" />
-        <div class="flex gap-2">
-          <input id="chatMessage" type="text" placeholder="Type your message..." class="input-field flex-1" />
-          <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">Send</button>
+    <!-- Actions split layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Interactive AI Receptionist Chat Widget -->
+      <div class="cyber-card rounded-[2rem] rounded-tr-md p-5 shadow-2xl flex flex-col h-[490px] border border-white/10">
+        <div class="pb-3.5 border-b border-white/5">
+          <h2 class="font-display font-extrabold text-cyan-400 text-xs flex items-center gap-2 uppercase tracking-wide">
+            <span>🤖</span> AI Receptionist Assistant
+          </h2>
+          <p class="text-[10px] text-slate-500 mt-1.5 font-semibold leading-normal">If the physician is offline, our AI will answer questions and alert the doctor.</p>
+        </div>
+
+        <!-- Chat messages view -->
+        <div id="chatMessages" class="flex-1 my-3.5 overflow-y-auto space-y-3.5 p-3 bg-slate-950/60 rounded-2xl flex flex-col border border-white/5 shadow-inner">
+          <!-- Bubbles appended here -->
+        </div>
+
+        <!-- Inputs form -->
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-2.5">
+            <input id="chatName" type="text" placeholder="Your name *" class="input-field shadow-sm" />
+            <input id="chatContact" type="tel" placeholder="Contact number (optional)" class="input-field shadow-sm" />
+          </div>
+          <div class="flex gap-2.5">
+            <input id="chatMessage" type="text" placeholder="Describe symptoms or ask receptionist..." class="input-field flex-1 shadow-sm" />
+            <button onclick="sendMessage()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold px-5 py-3.5 rounded-xl text-xs shadow-md transition-all shrink-0">Send</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Quick Book Section -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">📅 Quick Book</h2>
-      <div class="space-y-3">
-        <input id="qbName" type="text" placeholder="Your name *" class="input-field" />
-        <input id="qbContact" type="tel" placeholder="Phone +92 300 1234567 *" class="input-field" />
-        <input id="qbEmail" type="email" placeholder="Email *" class="input-field" />
-        <input id="qbDate" type="date" class="input-field" />
-        <select id="qbSlot" class="input-field"><option value="">Select slot...</option></select>
-        <select id="qbType" class="input-field"><option value="online">Online</option><option value="in_person">In-Person</option></select>
-        <textarea id="qbSymptoms" placeholder="Symptoms (optional)" class="input-field resize-none h-16"></textarea>
-        <button onclick="quickBook()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-xl text-sm transition-colors">Book Appointment</button>
+      <!-- Quick Booking Form -->
+      <div class="cyber-card rounded-[2rem] rounded-tr-md p-5 shadow-2xl space-y-4 flex flex-col justify-between h-[490px] border border-white/10">
+        <div class="pb-3.5 border-b border-white/5">
+          <h2 class="font-display font-extrabold text-cyan-400 text-xs flex items-center gap-2 uppercase tracking-wide">
+            <span>📅</span> Book Instant Slot
+          </h2>
+          <p class="text-[10px] text-slate-500 mt-1.5 font-semibold leading-normal">Acquire conflict-free scheduling and real-time confirmation.</p>
+        </div>
+
+        <div class="space-y-3 overflow-y-auto pr-1">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Your Full Name *</label>
+              <input id="qbName" type="text" placeholder="e.g. Hammad" class="input-field" />
+            </div>
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Contact Phone *</label>
+              <input id="qbContact" type="tel" placeholder="e.g. +92 300 1234567" class="input-field" />
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1">
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Email Address *</label>
+              <input id="qbEmail" type="email" placeholder="e.g. user@gmail.com" class="input-field" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Select Date</label>
+              <input id="qbDate" type="date" class="input-field font-semibold text-slate-400" />
+            </div>
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Available Slot</label>
+              <select id="qbSlot" class="input-field text-slate-400 font-bold">
+                <option value="">Select slot...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1">
+            <div>
+              <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Consultation Mode</label>
+              <select id="qbType" class="input-field font-semibold text-slate-400">
+                <option value="online">Online Consultation (Video/Call)</option>
+                <option value="in_person">In-Person Clinic Visit</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Symptom Note (Optional)</label>
+            <textarea id="qbSymptoms" placeholder="Optionally note down symptoms..." class="input-field resize-none h-14"></textarea>
+          </div>
+        </div>
+
+        <button onclick="quickBook()" class="w-full btn-premium text-white font-black py-4 rounded-2xl transition-all text-xs tracking-widest uppercase shadow-lg">
+          Confirm Appointment Slot
+        </button>
       </div>
+
     </div>
+  </main>
+
+  <!-- ── TOAST NOTIFICATION ──────────────────────────────────────────────────── -->
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+       bg-slate-900 text-white text-xs font-bold px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-800">
   </div>
-</main>
 
-<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-<!-- ── JAVASCRIPT ─────────────────────────────────────────────────────────── -->
-<script src="/js/app.js"></script>
-<script src="/js/chat.js"></script>
+  <!-- JAVASCRIPT -->
+  <script src="/js/app.js"></script>
+  <script src="/js/chat.js"></script>
+  
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const doctorId = params.get("id");
+    let doctorData = null;
 
-<script>
-const params=new URLSearchParams(window.location.search);
-const doctorId=params.get("id");
-let doctorData=null;
+    // ── Load Provider Profile ─────────────────────────────────────────────────
+    async function loadProfile() {
+      if (!doctorId) {
+        document.getElementById("profileName").textContent = "No doctor ID specified.";
+        return;
+      }
 
-async function loadProfile(){
-  if(!doctorId){document.getElementById("profileName").textContent="No doctor ID provided.";return}
-  try{
-    doctorData = await apiFetch(`${API_BASE}/doctors/${doctorId}`);
-    document.title=`${doctorData.name} — Smart Doctor Connect AI`;
-    document.getElementById("profileName").textContent=doctorData.name;
-    document.getElementById("profileSpec").textContent=doctorData.specialization;
-    document.getElementById("profileLocation").textContent="📍 "+doctorData.location;
-    document.getElementById("profileType").textContent="🏥 "+doctorData.consultation_type;
-    document.getElementById("profileFee").textContent="💰 Rs. "+(doctorData.consultation_fee?.toLocaleString()??"—");
-    document.getElementById("profileExp").textContent="🎓 "+doctorData.experience_years+" yrs";
-    document.getElementById("profilePhone").textContent="📞 "+(doctorData.phone||"—");
-    document.getElementById("profileBio").textContent=doctorData.bio||"";
-    
-    const stars="★".repeat(Math.round(doctorData.rating||0))+"☆".repeat(5-Math.round(doctorData.rating||0));
-    document.getElementById("profileRating").textContent=stars;
-    document.getElementById("profileReviews").textContent=`${doctorData.rating?.toFixed(1)} (${doctorData.total_reviews} reviews)`;
-    
-    const badge=document.getElementById("profileAvailBadge");
-    badge.textContent=doctorData.is_available?"Available":"Unavailable";
-    badge.className=`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 ${doctorData.is_available?"bg-green-100 text-green-700":"bg-red-100 text-red-600"}`;
-    
-    renderSchedule(doctorData.availability||{});
-    setupBookingDate();
-    initChat(doctorId);
-  }catch(err){
-    console.error(err);
-    document.getElementById("profileName").textContent="Doctor not found.";
-  }
-}
+      try {
+        doctorData = await apiFetch(`${API_BASE}/doctors/${doctorId}`);
+        document.title = `${doctorData.name} — Profile Detail`;
+        
+        document.getElementById("profileName").textContent = doctorData.name;
+        document.getElementById("profileSpec").textContent = doctorData.specialization;
+        document.getElementById("profileLocation").textContent = "📍 " + doctorData.location;
+        document.getElementById("profileType").textContent = "🏥 " + doctorData.consultation_type;
+        document.getElementById("profileFee").textContent = "💰 Rs. " + (doctorData.consultation_fee?.toLocaleString() || "—");
+        document.getElementById("profileExp").textContent = "🎓 " + doctorData.experience_years + " yrs exp";
+        document.getElementById("profilePhone").textContent = "📞 " + (doctorData.phone || "—");
+        document.getElementById("profileBio").textContent = doctorData.bio || "No professional biography has been provided.";
+        
+        // Stars reviews
+        const stars = "★".repeat(Math.round(doctorData.rating || 0)) + "☆".repeat(5 - Math.round(doctorData.rating || 0));
+        document.getElementById("profileRating").textContent = stars;
+        document.getElementById("profileReviews").textContent = `${doctorData.rating?.toFixed(1)} (${doctorData.total_reviews} reviews)`;
 
-function renderSchedule(avail){
-  const c=document.getElementById("availSchedule");c.innerHTML="";
-  const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-  days.forEach(day=>{
-    const slots=avail[day];
-    if(!slots||!slots.length)return;
-    const div=document.createElement("div");
-    div.className="bg-slate-50 rounded-lg p-2";
-    div.innerHTML=`<p class="font-semibold text-slate-700 mb-1">${day}</p>${slots.map(s=>`<span class="inline-block bg-sky-100 text-sky-700 px-1.5 py-0.5 rounded mr-1 mb-1">${s}</span>`).join("")}`;
-    c.appendChild(div);
-  });
-  if(!c.children.length)c.innerHTML='<p class="text-slate-400 col-span-full">No availability set.</p>';
-}
+        const badge = document.getElementById("profileAvailBadge");
+        badge.textContent = doctorData.is_available ? "Available" : "Offline";
+        badge.className = `text-[9px] font-black px-3.5 py-1.5 rounded-full uppercase shadow-sm border ${
+          doctorData.is_available 
+            ? "bg-cyan-950/40 text-cyan-400 border-cyan-500/20" 
+            : "bg-red-950/40 text-red-400 border-red-500/20"
+        }`;
 
-function setupBookingDate(){
-  const today=getTodayStr();
-  const d=document.getElementById("qbDate");d.min=today;d.value=today;
-  d.onchange=()=>updateSlots(d.value);
-  updateSlots(today);
-}
+        renderSchedule(doctorData.availability || {});
+        setupBookingDate();
+        initChat(doctorId);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("profileName").textContent = "Physician not found.";
+      }
+    }
 
-function updateSlots(dateStr){
-  const day=getDayName(dateStr);
-  const slots=(doctorData?.availability||{})[day]||[];
-  const sel=document.getElementById("qbSlot");
-  sel.innerHTML=slots.length?slots.map(s=>`<option value="${s}">${s}</option>`).join(""):`<option value="">No slots for ${day}</option>`;
-}
+    function renderSchedule(avail) {
+      const container = document.getElementById("availSchedule");
+      if (!container) return;
 
-async function quickBook(){
-  const name=document.getElementById("qbName").value.trim();
-  const contact=document.getElementById("qbContact").value.trim();
-  const email=document.getElementById("qbEmail").value.trim();
-  const date=document.getElementById("qbDate").value;
-  const slot=document.getElementById("qbSlot").value;
-  const type=document.getElementById("qbType").value;
-  const symptoms=document.getElementById("qbSymptoms").value.trim();
-  if(!name||!contact||!email||!date||!slot){showToast("Fill all required fields.");return}
-  try{
-    const r = await fetch(`${API_BASE}/appointments/`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({doctor_id:doctorId,doctor_name:doctorData?.name||"",patient_name:name,patient_contact:contact,patient_email:email,date,time_slot:slot,consultation_type:type,symptoms})
-    });
-    if(r.status===409){showToast("⚠️ Slot already booked.");return}
-    if(!r.ok)throw new Error();
-    const data = await r.json();
-    showToast(`✅ Booked! Queue #${data.queue_position}`);
-  }catch{showToast("Booking failed.")}
-}
+      container.innerHTML = "";
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      
+      days.forEach(day => {
+        const slots = avail[day];
+        if (!slots || !slots.length) return;
+        
+        const div = document.createElement("div");
+        div.className = "bg-slate-900/60 border border-white/5 rounded-2xl p-3.5 shadow-sm";
+        div.innerHTML = `
+          <p class="font-extrabold text-white mb-2 uppercase tracking-widest text-[9px]">${day}</p>
+          <div class="space-y-1.5">
+            ${slots.map(s => `<span class="block bg-cyan-950/40 text-cyan-400 font-bold border border-cyan-500/20 px-1 py-0.5 rounded text-[10px] text-center">${s}</span>`).join("")}
+          </div>`;
+        container.appendChild(div);
+      });
 
-// Re-map sendMessage to the one in chat.js
-function sendMessage() {
-  sendChatMessage();
-}
+      if (!container.children.length) {
+        container.innerHTML = '<p class="text-slate-500 col-span-full text-xs font-semibold">No availability configured.</p>';
+      }
+    }
 
-loadProfile();
-</script>
+    function setupBookingDate() {
+      const today = getTodayStr();
+      const input = document.getElementById("qbDate");
+      if (!input) return;
+
+      input.min = today;
+      input.value = today;
+      input.onchange = () => updateSlots(input.value);
+      updateSlots(today);
+    }
+
+    function updateSlots(dateStr) {
+      const day = getDayName(dateStr);
+      const slots = (doctorData?.availability || {})[day] || [];
+      const select = document.getElementById("qbSlot");
+      if (!select) return;
+
+      select.innerHTML = slots.length 
+        ? slots.map(s => `<option value="${s}">${s}</option>`).join("") 
+        : `<option value="">No slots configured for ${day}</option>`;
+    }
+
+    async function quickBook() {
+      const name = document.getElementById("qbName").value.trim();
+      const contact = document.getElementById("qbContact").value.trim();
+      const email = document.getElementById("qbEmail").value.trim();
+      const date = document.getElementById("qbDate").value;
+      const slot = document.getElementById("qbSlot").value;
+      const type = document.getElementById("qbType").value;
+      const symptoms = document.getElementById("qbSymptoms").value.trim();
+
+      if (!name || !contact || !email || !date || !slot) {
+        showToast("Please fill all required inputs.");
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/appointments/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            doctor_id: doctorId,
+            doctor_name: doctorData?.name || "",
+            patient_name: name,
+            patient_contact: contact,
+            patient_email: email,
+            date,
+            time_slot: slot,
+            consultation_type: type,
+            symptoms
+          })
+        });
+
+        if (resp.status === 409) {
+          showToast("⚠️ This slot is already booked. Choose another!");
+          return;
+        }
+
+        if (!resp.ok) throw new Error();
+        
+        const data = await resp.json();
+        showToast(`✅ Successfully Booked! Queue Position #${data.queue_position}`);
+        
+        document.getElementById("qbSlot").value = "";
+        document.getElementById("qbSymptoms").value = "";
+      } catch (err) {
+        showToast("Failed to book slot. Verify entries.");
+      }
+    }
+
+    function sendMessage() {
+      sendChatMessage();
+    }
+
+    loadProfile();
+  </script>
 </body>
 </html>

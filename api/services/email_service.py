@@ -7,7 +7,7 @@ In production, swap the print statements with SendGrid / SMTP calls.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from api.database import get_db
@@ -40,7 +40,7 @@ async def send_doctor_notification(
             f"Please log in to Smart Doctor Connect to respond.\n\n"
             f"— Smart Doctor Connect AI"
         ),
-        "sent_at": datetime.utcnow(),
+        "sent_at": datetime.now(timezone.utc),
         "status": "simulated",
     }
 
@@ -104,7 +104,7 @@ async def send_appointment_confirmation(
             f"Please arrive 10 minutes early for in-person visits.\n\n"
             f"— Smart Doctor Connect AI"
         ),
-        "sent_at": datetime.utcnow(),
+        "sent_at": datetime.now(timezone.utc),
         "status": "simulated",
     }
 
@@ -152,7 +152,7 @@ async def send_followup_reminder(
             f"3. Visiting the nearest hospital if symptoms are urgent\n\n"
             f"— Smart Doctor Connect AI"
         ),
-        "sent_at": datetime.utcnow(),
+        "sent_at": datetime.now(timezone.utc),
         "status": "simulated",
     }
 

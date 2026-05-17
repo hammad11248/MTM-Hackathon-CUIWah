@@ -6,7 +6,7 @@ Run: python seed_data.py
 
 import asyncio
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -33,7 +33,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.7,
         "total_reviews": 84,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Usman Ali",
@@ -53,7 +53,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.5,
         "total_reviews": 62,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Ayesha Khan",
@@ -75,7 +75,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.9,
         "total_reviews": 120,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Bilal Hussain",
@@ -95,7 +95,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.6,
         "total_reviews": 75,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Fatima Zahra",
@@ -115,7 +115,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.8,
         "total_reviews": 95,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Hassan Raza",
@@ -138,7 +138,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.3,
         "total_reviews": 200,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Zainab Malik",
@@ -158,7 +158,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.7,
         "total_reviews": 88,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Ahmed Qureshi",
@@ -178,7 +178,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.4,
         "total_reviews": 55,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Mariam Siddiqui",
@@ -198,7 +198,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.8,
         "total_reviews": 67,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Tariq Mehmood",
@@ -219,7 +219,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.2,
         "total_reviews": 110,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Nadia Farooq",
@@ -239,7 +239,7 @@ DEMO_DOCTORS = [
         "is_available": True,
         "rating": 4.6,
         "total_reviews": 72,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
     {
         "name": "Dr. Kamran Shah",
@@ -259,7 +259,7 @@ DEMO_DOCTORS = [
         "is_available": False,
         "rating": 4.1,
         "total_reviews": 48,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     },
 ]
 

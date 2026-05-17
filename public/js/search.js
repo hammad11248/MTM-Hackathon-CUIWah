@@ -45,7 +45,7 @@ async function handleSearch() {
 }
 
 // ── Render Search Results ───────────────────────────────────────────────────
-function renderSearchResults(data) {
+function renderSearchResults(data, isSearch = true) {
   const grid = document.getElementById("doctorGrid");
   const empty = document.getElementById("emptyState");
   const heading = document.getElementById("resultsHeading");
@@ -54,9 +54,11 @@ function renderSearchResults(data) {
   if (!grid) return;
   grid.innerHTML = "";
 
-  // Show analysis banner
-  if (data.specializations?.length) {
+  // Show analysis banner if it is an AI search result
+  if (isSearch && data.specializations?.length) {
     showAnalysisBanner(data);
+  } else {
+    hideAnalysisBanner();
   }
 
   if (!data.doctors?.length) {
@@ -67,22 +69,43 @@ function renderSearchResults(data) {
   }
 
   if (empty) empty.classList.add("hidden");
-  if (heading) heading.classList.remove("hidden");
+  if (heading) {
+    heading.textContent = isSearch ? "Matching Doctors" : "Featured Specialists Across Pakistan";
+    heading.classList.remove("hidden");
+  }
   if (count)
-    count.textContent = `${data.doctors.length} result${data.doctors.length !== 1 ? "s" : ""}`;
+    count.textContent = isSearch 
+      ? `${data.doctors.length} result${data.doctors.length !== 1 ? "s" : ""}`
+      : `${data.doctors.length} available doctor${data.doctors.length !== 1 ? "s" : ""}`;
 
   data.doctors.forEach((doc) => {
     grid.insertAdjacentHTML("beforeend", buildDoctorCard(doc));
   });
 }
 
+// ── Load Featured Doctors by Default ────────────────────────────────────────
+async function loadFeaturedDoctors() {
+  showSkeleton(true);
+  try {
+    const resp = await fetch(`${API_BASE}/doctors/?limit=9`);
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    const doctors = await resp.json();
+    renderSearchResults({ doctors }, false);
+  } catch (err) {
+    showToast("Failed to load doctors. Please try again.");
+    console.error("Load featured error:", err);
+  } finally {
+    showSkeleton(false);
+  }
+}
+
 // ── Analysis Banner ─────────────────────────────────────────────────────────
 function showAnalysisBanner(data) {
   const urgencyColors = {
-    EMERGENCY: "bg-red-100 text-red-700",
-    HIGH: "bg-orange-100 text-orange-700",
-    MEDIUM: "bg-yellow-100 text-yellow-700",
-    LOW: "bg-green-100 text-green-700",
+    EMERGENCY: "bg-red-950/40 text-red-400 border border-red-500/20",
+    HIGH: "bg-orange-950/40 text-orange-400 border border-orange-500/20",
+    MEDIUM: "bg-yellow-950/40 text-yellow-400 border border-yellow-500/20",
+    LOW: "bg-green-950/40 text-green-400 border border-green-500/20",
   };
 
   const banner = document.getElementById("analysisBanner");
@@ -130,6 +153,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (q) {
       searchInput.value = q;
       handleSearch();
+    } else {
+      loadFeaturedDoctors();
     }
   }
 });

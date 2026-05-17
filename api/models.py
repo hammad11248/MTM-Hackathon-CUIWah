@@ -5,9 +5,9 @@ All request/response schemas live here. MongoDB _id is handled via aliases.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -27,20 +27,6 @@ class ConsultationType(str, Enum):
     online = "online"
     in_person = "in_person"
     both = "both"
-
-
-class AppointmentStatus(str, Enum):
-    pending = "pending"
-    confirmed = "confirmed"
-    cancelled = "cancelled"
-    completed = "completed"
-
-
-class UrgencyLevel(str, Enum):
-    low = "LOW"
-    medium = "MEDIUM"
-    high = "HIGH"
-    emergency = "EMERGENCY"
 
 
 # ── Doctor Models ─────────────────────────────────────────────────────────────
@@ -76,7 +62,7 @@ class DoctorInDB(DoctorCreate):
     """Doctor as stored in MongoDB (includes generated fields)."""
 
     id: Optional[str] = Field(None, alias="_id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = {"populate_by_name": True}
 
@@ -103,6 +89,13 @@ class DoctorUpdate(MongoBaseModel):
 
 
 # ── Appointment Models ────────────────────────────────────────────────────────
+class AppointmentStatus(str, Enum):
+    pending = "pending"
+    confirmed = "confirmed"
+    cancelled = "cancelled"
+    completed = "completed"
+
+
 class AppointmentCreate(MongoBaseModel):
     """Payload to book a new appointment."""
 
@@ -124,7 +117,7 @@ class AppointmentInDB(AppointmentCreate):
     status: AppointmentStatus = AppointmentStatus.confirmed
     queue_position: int = Field(default=1, ge=1)
     predicted_wait_minutes: Optional[int] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = {"populate_by_name": True}
 
@@ -145,12 +138,19 @@ class MessageInDB(MessageCreate):
     id: Optional[str] = Field(None, alias="_id")
     ai_response: str
     doctor_available: bool
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = {"populate_by_name": True}
 
 
 # ── AI Search Models ──────────────────────────────────────────────────────────
+class UrgencyLevel(str, Enum):
+    low = "LOW"
+    medium = "MEDIUM"
+    high = "HIGH"
+    emergency = "EMERGENCY"
+
+
 class AISearchResult(MongoBaseModel):
     """Structured output from the symptom analysis engine."""
 
@@ -158,4 +158,18 @@ class AISearchResult(MongoBaseModel):
     urgency: UrgencyLevel
     home_advice: str
     detected_location: Optional[str] = None
+    doctors: List[DoctorResponse] = Field(default_factory=list)
+
+
+# ── General Triage Assistant Models ──────────────────────────────────────────
+class TriageMessageCreate(MongoBaseModel):
+    patient_name: str
+    message: str
+
+
+class TriageMessageResponse(MongoBaseModel):
+    ai_response: str
+    specializations: List[str]
+    urgency: UrgencyLevel
+    home_advice: str
     doctors: List[DoctorResponse] = Field(default_factory=list)

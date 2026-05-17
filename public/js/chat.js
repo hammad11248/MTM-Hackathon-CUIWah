@@ -130,10 +130,10 @@ function addChatBubble(text, type, sender) {
   const bubble = document.createElement("div");
   const isPatient = type === "patient";
 
-  bubble.className = `max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed ${
+  bubble.className = `max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-md ${
     isPatient
-      ? "bg-sky-100 text-sky-900 self-end ml-auto rounded-br-sm"
-      : "bg-emerald-50 text-emerald-900 self-start mr-auto rounded-bl-sm"
+      ? "bg-violet-900/40 text-violet-50 border border-violet-500/30 self-end ml-auto rounded-br-sm"
+      : "bg-cyan-900/40 text-cyan-50 border border-cyan-500/30 self-start mr-auto rounded-bl-sm"
   }`;
 
   const timeStr = new Date().toLocaleTimeString("en-US", {
@@ -142,9 +142,9 @@ function addChatBubble(text, type, sender) {
   });
 
   bubble.innerHTML = `
-    <div class="flex items-center gap-1.5 mb-1">
-      <span class="text-xs font-semibold opacity-60">${esc(sender)}</span>
-      <span class="text-[10px] opacity-40">${timeStr}</span>
+    <div class="flex items-center gap-1.5 mb-1 opacity-70">
+      <span class="text-[10px] font-black uppercase tracking-wider">${esc(sender)}</span>
+      <span class="text-[9px] opacity-60">${timeStr}</span>
     </div>
     <p>${esc(text)}</p>
   `;
@@ -162,15 +162,15 @@ function addTypingIndicator() {
   const indicator = document.createElement("div");
   indicator.id = id;
   indicator.className =
-    "self-start mr-auto bg-emerald-50 text-emerald-700 px-4 py-2 rounded-2xl rounded-bl-sm text-sm";
+    "self-start mr-auto bg-cyan-900/40 border border-cyan-500/30 text-cyan-400 px-4 py-3 rounded-2xl rounded-bl-sm text-sm shadow-md";
   indicator.innerHTML = `
     <div class="flex items-center gap-1">
-      <span class="text-xs font-semibold opacity-60">AI Receptionist</span>
+      <span class="text-[10px] font-black uppercase tracking-wider opacity-70">AI Receptionist</span>
     </div>
-    <div class="flex gap-1 mt-1">
-      <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
-      <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
-      <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+    <div class="flex gap-1.5 mt-2">
+      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
     </div>`;
 
   container.appendChild(indicator);

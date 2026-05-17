@@ -1,27 +1,23 @@
 import asyncio
-import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
 
-async def test_conn():
-    load_dotenv()
-    uri = os.getenv("MONGODB_URI")
-    print(f"Testing URI: {uri[:20]}...")
+async def test():
+    """
+    Tests the local MongoDB connection.
+    Properly wraps the client initialization and execution in an async function.
+    """
+    uri = "mongodb://localhost:27017"
     client = AsyncIOMotorClient(uri)
     try:
-        # The ismaster command is cheap and does not require auth.
-        # But we want to check if we can actually access the DB.
         await client.admin.command('ping')
-        print("Ping successful!")
-        db = client.get_default_database()
-        print(f"Connected to DB: {db.name}")
-        # Try a simple operation
-        await db.command("dbstats")
-        print("DB Stats successful!")
+        print("Success! Local MongoDB is running.")
     except Exception as e:
-        print(f"Connection failed: {e}")
+        print(f"Local MongoDB is not running: {e}")
     finally:
+        # Best practice: close the client to avoid unclosed socket warnings on exit
+        # This properly belongs inside the async function wrapper.
         client.close()
 
 if __name__ == "__main__":
-    asyncio.run(test_conn())
+    # Safely executes the async function in the main block
+    asyncio.run(test())
