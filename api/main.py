@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -129,15 +130,34 @@ async def health_check():
     }
 
 # ─────────────────────────────────────────────────────────────
-# Static Files
-# On Vercel, static files are served by @vercel/static via routes.
-# In development, FastAPI serves them directly.
+# Static HTML Pages
+# Explicit routes ensure Vercel serves the frontend correctly.
 # ─────────────────────────────────────────────────────────────
-if ENVIRONMENT == "development":
-    import os as _os
-    _public_dir = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "public")
-    if _os.path.isdir(_public_dir):
-        app.mount("/", StaticFiles(directory=_public_dir, html=True), name="static")
+_public_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "public")
+
+
+@app.get("/", include_in_schema=False)
+async def read_index():
+    return FileResponse(os.path.join(_public_dir, "index.html"))
+
+
+@app.get("/doctor-dashboard.html", include_in_schema=False)
+async def read_doctor_dashboard():
+    return FileResponse(os.path.join(_public_dir, "doctor-dashboard.html"))
+
+
+@app.get("/doctor-profile.html", include_in_schema=False)
+async def read_doctor_profile():
+    return FileResponse(os.path.join(_public_dir, "doctor-profile.html"))
+
+
+# ─────────────────────────────────────────────────────────────
+# Static Assets (CSS, JS, images)
+# Mounted AFTER explicit routes so API and HTML routes take priority.
+# Works in both development and production (Vercel).
+# ─────────────────────────────────────────────────────────────
+if os.path.isdir(_public_dir):
+    app.mount("/", StaticFiles(directory=_public_dir), name="static")
 
 # ─────────────────────────────────────────────────────────────
 # Direct Execution Support
