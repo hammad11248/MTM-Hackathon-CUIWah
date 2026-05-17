@@ -137,10 +137,10 @@ function addTriageBubble(text, type, sender) {
   const bubble = document.createElement("div");
   const isPatient = type === "patient";
 
-  bubble.className = `max-w-[85%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-md ${
+  bubble.className = `max-w-[85%] p-3.5 text-sm leading-relaxed shadow-sm ${
     isPatient
-      ? "bg-violet-900/40 text-violet-50 border border-violet-500/30 self-end ml-auto rounded-tr-sm"
-      : "bg-cyan-900/40 text-cyan-50 border border-cyan-500/30 self-start mr-auto rounded-tl-sm"
+      ? "chat-bubble-user self-end ml-auto rounded-2xl rounded-tr-sm"
+      : "chat-bubble-ai self-start mr-auto rounded-2xl rounded-tl-sm"
   }`;
 
   const timeStr = new Date().toLocaleTimeString("en-US", {
@@ -149,9 +149,9 @@ function addTriageBubble(text, type, sender) {
   });
 
   bubble.innerHTML = `
-    <div class="flex items-center gap-1.5 mb-1.5 opacity-70">
-      <span class="font-black text-[9px] uppercase tracking-wider">${esc(sender)}</span>
-      <span class="text-[8px] opacity-70">${timeStr}</span>
+    <div class="flex items-center gap-1.5 mb-1.5 opacity-80">
+      <span class="font-bold text-[10px] uppercase tracking-wider">${esc(sender)}</span>
+      <span class="text-[9px] opacity-70">${timeStr}</span>
     </div>
     <p class="whitespace-pre-line">${esc(text)}</p>
   `;
@@ -173,16 +173,16 @@ function addTriageRecommendationCard(data) {
   };
 
   const card = document.createElement("div");
-  card.className = "bg-slate-900/80 border border-cyan-500/30 rounded-xl p-3 my-2 self-start mr-auto w-[90%] text-xs shadow-sm text-cyan-50";
+  card.className = "bg-white border border-brand-100 rounded-xl p-4 my-2 self-start mr-auto w-[90%] text-sm shadow-sm text-slate-700";
 
   card.innerHTML = `
-    <div class="font-black text-cyan-400 mb-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
+    <div class="font-bold text-brand-600 mb-2 flex items-center justify-between text-[11px] uppercase tracking-wider">
       <span>📋 Medical Triage Analysis</span>
-      <span class="px-2 py-0.5 rounded ${urgencyColors[data.urgency]}">${data.urgency}</span>
+      <span class="px-2 py-0.5 rounded text-white font-semibold ${urgencyColors[data.urgency]}">${data.urgency}</span>
     </div>
-    <div class="text-[10px] text-slate-300 space-y-1.5">
-      <p><strong class="text-slate-400">Specialist Needed:</strong> ${esc(data.specializations.join(", "))}</p>
-      <p><strong class="text-slate-400">Home Advice:</strong> ${esc(data.home_advice)}</p>
+    <div class="text-xs text-slate-600 space-y-2 mt-3">
+      <p><strong class="text-slate-800">Specialist Needed:</strong> ${esc(data.specializations.join(", "))}</p>
+      <p><strong class="text-slate-800">Home Advice:</strong> ${esc(data.home_advice)}</p>
     </div>
   `;
 
@@ -199,32 +199,31 @@ function addTriageDoctorSuggestions(doctors) {
   div.className = "self-start w-[90%] my-2 space-y-2";
 
   const label = document.createElement("div");
-  label.className = "text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1 mb-1";
-  label.textContent = "Recommended Nodes:";
+  label.className = "text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2";
+  label.textContent = "Recommended Specialists:";
   div.appendChild(label);
 
   doctors.forEach((doc) => {
-    // Cache doctor availability globally
     window.doctorCache = window.doctorCache || {};
     window.doctorCache[doc._id] = doc.availability || {};
 
     const card = document.createElement("div");
-    card.className = "bg-slate-900/60 border border-white/10 rounded-xl p-3 shadow-sm hover:border-cyan-500/40 transition-all flex items-center justify-between text-white";
+    card.className = "glass-card p-4 shadow-sm hover:border-brand-500 transition-all flex items-center justify-between";
 
     card.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span class="text-xl">👨‍⚕️</span>
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">👨‍⚕️</span>
         <div>
-          <h4 class="font-bold text-white text-[11px]">${esc(doc.name)}</h4>
-          <p class="text-[9px] font-semibold text-cyan-400 mt-0.5">${esc(doc.specialization)} • ${esc(doc.location)}</p>
+          <h4 class="font-bold text-slate-900 text-sm">${esc(doc.name)}</h4>
+          <p class="text-xs font-medium text-brand-600 mt-0.5">${esc(doc.specialization)} • ${esc(doc.location)}</p>
           <div class="flex items-center gap-1 mt-1">
-            <span class="text-yellow-400 text-[10px]">★</span>
-            <span class="text-[9px] font-bold text-slate-400">${doc.rating || "4.5"}</span>
+            <span class="text-amber-400 text-xs">★</span>
+            <span class="text-xs font-bold text-slate-500">${doc.rating || "4.5"}</span>
           </div>
         </div>
       </div>
       <button onclick="openBooking('${doc._id}', '${esc(doc.name)}', window.doctorCache['${doc._id}'])" 
-        class="bg-cyan-950/40 border border-cyan-500/30 hover:bg-cyan-950/60 text-cyan-400 font-black tracking-wider uppercase px-2.5 py-1.5 rounded-lg text-[9px] shadow-sm transition-colors">
+        class="btn-primary font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm">
         Book
       </button>
     `;
@@ -243,12 +242,12 @@ function addTriageTypingIndicator() {
   const id = "triage-typing-" + Date.now();
   const indicator = document.createElement("div");
   indicator.id = id;
-  indicator.className = "self-start mr-auto bg-cyan-900/40 border border-cyan-500/30 text-cyan-400 px-4 py-3 rounded-2xl rounded-bl-sm text-xs shadow-sm w-24";
+  indicator.className = "self-start mr-auto bg-brand-50 border border-brand-100 text-brand-600 px-4 py-3 rounded-2xl rounded-bl-sm text-sm shadow-sm w-20";
   indicator.innerHTML = `
     <div class="flex gap-1.5 justify-center items-center h-4">
-      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
-      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
-      <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+      <span class="w-1.5 h-1.5 bg-brand-500 rounded-full typing-dot"></span>
+      <span class="w-1.5 h-1.5 bg-brand-500 rounded-full typing-dot"></span>
+      <span class="w-1.5 h-1.5 bg-brand-500 rounded-full typing-dot"></span>
     </div>`;
 
   container.appendChild(indicator);

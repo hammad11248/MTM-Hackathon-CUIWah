@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Doctor Connect — Pakistan's AI Triage Hologram</title>
+  <title>Smart Doctor Connect — AI Triage & Directory</title>
   
-  <!-- Premium Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -16,8 +15,21 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
             display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            },
+            teal: {
+              500: '#14b8a6',
+              600: '#0d9488',
+            }
           }
         }
       }
@@ -25,528 +37,166 @@
   </script>
   
   <style>
-    :root {
-      --primary: #06b6d4;       /* Neon Cyan */
-      --secondary: #8b5cf6;     /* Neon Violet */
-      --accent: #ec4899;        /* Electric Magenta */
-      --obsidian: #090b11;      /* Deep Space Obsidian */
-    }
-
     body {
-      background-color: var(--obsidian);
-      color: #f1f5f9;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%),
-        linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 100% 100%, 45px 45px, 45px 45px;
+      background-color: #f8fafc;
+      color: #334155;
     }
-
-    /* Ambient glowing lights */
-    .ambient-glow {
-      position: absolute;
-      border-radius: 9999px;
-      filter: blur(140px);
-      pointer-events: none;
-      z-index: -1;
-      opacity: 0.45;
+    
+    .glass-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border-radius: 16px;
+      transition: all 0.2s ease-in-out;
     }
-
-    /* Cyber Translucent Glass Cards */
-    .cyber-card {
-      background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.6), 
-                  inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .cyber-card:hover {
-      transform: translateY(-6px) scale(1.005);
-      border-color: rgba(6, 182, 212, 0.35);
-      box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.22),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    .cyber-header {
-      background: rgba(9, 11, 17, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    /* Skeleton shimmer */
-    @keyframes shimmer {
-      0%   { background-position: -400px 0; }
-      100% { background-position: 400px 0; }
-    }
-    .skeleton {
-      background: linear-gradient(90deg, rgba(30, 41, 59, 0.5) 25%, rgba(51, 65, 85, 0.6) 50%, rgba(30, 41, 59, 0.5) 75%);
-      background-size: 800px 100%;
-      animation: shimmer 1.4s infinite linear;
-      border-radius: 20px;
-    }
-
-    /* Cyber neon buttons */
-    .btn-neon-cyan {
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-      box-shadow: 0 4px 20px -3px rgba(6, 182, 212, 0.35),
-                  0 2px 8px -1px rgba(6, 182, 212, 0.2);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-neon-cyan:hover {
-      box-shadow: 0 8px 30px -3px rgba(6, 182, 212, 0.5),
-                  0 4px 12px -1px rgba(6, 182, 212, 0.3);
-      transform: translateY(-2px);
-    }
-    .btn-neon-cyan:active {
-      transform: translateY(0);
-    }
-
-    .btn-neon-violet {
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-      box-shadow: 0 4px 20px -3px rgba(139, 92, 246, 0.35),
-                  0 2px 8px -1px rgba(139, 92, 246, 0.2);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-neon-violet:hover {
-      box-shadow: 0 8px 30px -3px rgba(139, 92, 246, 0.5),
-                  0 4px 12px -1px rgba(139, 92, 246, 0.3);
+    .glass-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
       transform: translateY(-2px);
     }
 
-    .pulse-ring {
-      position: relative;
-    }
-    .pulse-ring::before {
-      content: '';
-      position: absolute;
+    .input-field {
       width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background-color: inherit;
-      opacity: 0.6;
-      animation: pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-      top: 0;
-      left: 0;
-      z-index: -1;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      outline: none;
+      color: #1e293b;
+      background-color: #ffffff;
+      transition: all 0.2s ease;
     }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.6; }
-      100% { transform: scale(2.5); opacity: 0; }
+    .input-field:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    
+    .chat-bubble-ai {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble-user {
+      background: #2563eb;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Typing animation */
+    .typing-dot {
+      animation: typing 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 12px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
 
-<body class="text-slate-200 antialiased min-h-screen relative overflow-x-hidden font-sans">
+<body class="antialiased min-h-screen relative font-sans">
   
-  <!-- Ambient Space Mesh Glows -->
-  <div class="ambient-glow w-[600px] h-[600px] bg-violet-600/10 -top-60 -left-60"></div>
-  <div class="ambient-glow w-[700px] h-[700px] bg-cyan-500/10 top-1/4 -right-60"></div>
-  <div class="ambient-glow w-[500px] h-[500px] bg-magenta-500/5 bottom-10 left-10"></div>
-
-  <!-- ── CYBER TRANS-GLASS HEADER ──────────────────────────────────────────── -->
-  <header class="cyber-header sticky top-0 z-40 shadow-xl">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3 group">
-        <div class="w-12 h-12 rounded-[1.2rem] rounded-tr-md bg-gradient-to-tr from-cyan-500 via-violet-600 to-pink-500 flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 duration-300">
-          <span class="text-white text-2xl select-none">🏥</span>
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center shadow-md">
+          <span class="text-white text-xl">⚕️</span>
         </div>
         <div>
-          <span class="font-display font-extrabold text-xl text-white leading-tight block tracking-tight">Smart Doctor</span>
-          <span class="text-cyan-400 font-black text-[10px] block tracking-[0.25em] uppercase -mt-0.5">Connect AI</span>
+          <span class="font-display font-bold text-xl text-slate-900 leading-none block">Smart Doctor</span>
+          <span class="text-brand-600 font-bold text-[10px] uppercase tracking-widest block mt-0.5">Connect AI</span>
         </div>
       </a>
-      
-      <nav class="flex items-center gap-3 text-sm font-bold">
-        <a href="/index.html" class="px-4 py-2.5 rounded-2xl bg-cyan-950/40 text-cyan-400 flex items-center gap-2 border border-cyan-500/20 shadow-md">
-          <span>🔍</span> Find Doctor
-        </a>
-        <a href="/doctor-dashboard.html" class="px-4 py-2.5 rounded-2xl text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 hover:bg-slate-900/50">
-          <span>👨‍⚕️</span> For Doctors
-        </a>
+      <nav class="flex items-center gap-4 text-sm font-semibold">
+        <a href="/index.html" class="text-brand-600 bg-brand-50 px-4 py-2 rounded-lg">Directory</a>
+        <a href="/doctor-dashboard.html" class="text-slate-500 hover:text-slate-900 transition-colors">For Doctors</a>
       </nav>
     </div>
   </header>
 
-  <!-- ── HERO HERO SECTION ──────────────────────────────────────────────────── -->
-  <section class="max-w-7xl mx-auto px-6 pt-20 pb-12 text-center relative z-10">
-    <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-violet-950/40 to-cyan-950/40 text-cyan-400 px-5 py-2.5 rounded-2xl text-xs font-black mb-8 border border-cyan-500/20 shadow-lg">
-      <span class="flex h-2.5 w-2.5 relative">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
-      </span>
-      <span class="tracking-widest uppercase">🌌 Pakistan's Cybernetic AI Triage Hologram</span>
-    </div>
-
-    <h1 class="font-display text-4xl sm:text-6xl lg:text-7.5xl font-black text-white tracking-tight leading-[1.05] mb-8">
-      Map Clinical Care <br/>
-      <span class="bg-gradient-to-r from-cyan-400 via-violet-500 to-pink-500 bg-clip-text text-transparent">With Absolute Hologram Precision</span>
-    </h1>
+  <main class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
     
-    <p class="text-slate-400 max-w-2xl mx-auto mb-14 text-base sm:text-lg leading-relaxed font-semibold">
-      Input symptoms in standard English or Urdu. The deep care mapping engine parses clinical pathways, assesses urgency, and connects you instantly with verified practitioners across Pakistan.
-    </p>
-
-    <!-- Cyber Glassmorphism Input Bar -->
-    <div class="max-w-3xl mx-auto bg-slate-950/60 backdrop-blur-xl p-3 rounded-[2rem] rounded-tr-md shadow-2xl border border-white/10 flex flex-col sm:flex-row items-stretch gap-2.5">
-      <div class="flex-1 flex items-center px-4 gap-3">
-        <span class="text-2xl text-cyan-400">🔍</span>
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Describe symptoms, e.g. acute chest tightness with tachycardia in Lahore..."
-          class="w-full py-4 text-white text-sm font-semibold outline-none bg-transparent placeholder-slate-500"
-          autocomplete="off"
-        />
+    <!-- Left Col: AI Triage -->
+    <div class="lg:col-span-5 flex flex-col h-[700px]">
+      <div class="mb-4">
+        <h2 class="font-display text-2xl font-bold text-slate-900">AI Triage Assistant</h2>
+        <p class="text-sm text-slate-500 mt-1">Describe your symptoms to receive instant medical routing.</p>
       </div>
-      <button
-        id="searchBtn"
-        onclick="handleSearch()"
-        class="btn-neon-cyan text-white font-bold text-sm px-10 py-5 rounded-2xl active:scale-[0.98] transition-all whitespace-nowrap flex items-center justify-center gap-2"
-      >
-        <span>🤖</span> Analyze Symptoms
-      </button>
-    </div>
-
-    <!-- Suggestion Pills -->
-    <div class="mt-10 flex flex-wrap justify-center gap-2.5 max-w-3xl mx-auto" id="suggestionPills">
-      <span class="text-xs text-slate-500 font-bold self-center mr-2 uppercase tracking-widest">Urgent Pathways:</span>
-      <button onclick="fillSearch('back pain Islamabad')" class="bg-slate-900/60 hover:bg-cyan-950/20 text-slate-300 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/30 shadow-md transition-all text-xs font-semibold px-4.5 py-2.5 rounded-xl">📍 Back Pain (Islamabad)</button>
-      <button onclick="fillSearch('diabetes sugar checkup Lahore')" class="bg-slate-900/60 hover:bg-cyan-950/20 text-slate-300 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/30 shadow-md transition-all text-xs font-semibold px-4.5 py-2.5 rounded-xl">🍭 Diabetes (Lahore)</button>
-      <button onclick="fillSearch('child fever cough Karachi')" class="bg-slate-900/60 hover:bg-cyan-950/20 text-slate-300 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/30 shadow-md transition-all text-xs font-semibold px-4.5 py-2.5 rounded-xl">👶 Child Fever (Karachi)</button>
-      <button onclick="fillSearch('heart palpitations Rawalpindi')" class="bg-slate-900/60 hover:bg-cyan-950/20 text-slate-300 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/30 shadow-md transition-all text-xs font-semibold px-4.5 py-2.5 rounded-xl">🫀 Palpitations (Rawalpindi)</button>
-      <button onclick="fillSearch('acne skin allergy Peshawar')" class="bg-slate-900/60 hover:bg-cyan-950/20 text-slate-300 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/30 shadow-md transition-all text-xs font-semibold px-4.5 py-2.5 rounded-xl">🧴 Skin Allergy (Peshawar)</button>
-    </div>
-  </section>
-
-  <!-- ── PAKISTAN'S LIVE CLINICAL OPERATIONS DENSITY TRACKER (JAW-DROPPING CYBER DENSITY MAP) ── -->
-  <section class="max-w-7xl mx-auto px-6 mb-20 relative z-10">
-    <div class="cyber-card rounded-[2.2rem] rounded-tr-md p-8 relative overflow-hidden border border-white/10">
-      <!-- Glow backgrounds inside card -->
-      <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-violet-500/10 rounded-full filter blur-3xl pointer-events-none"></div>
       
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 pb-6 border-b border-white/5">
-        <div>
-          <div class="flex items-center gap-2.5 text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block pulse-ring"></span>
-            <span>Live Regional Care Matrix</span>
-          </div>
-          <h2 class="font-display font-extrabold text-2xl text-white leading-none">Pakistan Clinical Grid Nodes</h2>
-          <p class="text-xs text-slate-400 mt-2.5 font-medium leading-relaxed">Real-time status indicators across operational care sectors.</p>
-        </div>
-        
-        <div class="flex flex-wrap gap-4 text-center shrink-0">
-          <div class="bg-slate-900/60 border border-white/5 rounded-2xl px-6 py-3.5 shadow-inner">
-            <p class="text-2xl font-black text-cyan-400 leading-none">12+</p>
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-2">Active Nodes</p>
-          </div>
-          <div class="bg-slate-900/60 border border-white/5 rounded-2xl px-6 py-3.5 shadow-inner">
-            <p class="text-2xl font-black text-violet-400 leading-none">99.4%</p>
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-2">Accuracy Matrix</p>
-          </div>
-          <div class="bg-slate-900/60 border border-white/5 rounded-2xl px-6 py-3.5 shadow-inner">
-            <p class="text-2xl font-black text-pink-400 leading-none">~1.2s</p>
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-2">Triage Clock</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cities Operational Map Cards Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <!-- Karachi -->
-        <div onclick="fillSearch('Karachi')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-cyan-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">🌊</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-cyan-400 transition-colors">Karachi</span>
-            <span class="h-2 w-2 rounded-full bg-cyan-400 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">3 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Avg: Rs. 1,200</p>
+      <div class="glass-card flex-1 flex flex-col p-5 h-full relative">
+        <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scroll-smooth">
+          <div class="chat-bubble-ai self-start rounded-2xl px-4 py-3 max-w-[85%] shadow-sm text-sm leading-relaxed">
+            <p>Hello! I am the Smart Doctor Connect AI. How are you feeling today?</p>
           </div>
         </div>
         
-        <!-- Lahore -->
-        <div onclick="fillSearch('Lahore')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-violet-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">🕌</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-violet-400 transition-colors">Lahore</span>
-            <span class="h-2 w-2 rounded-full bg-violet-400 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">4 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Avg: Rs. 1,500</p>
-          </div>
-        </div>
-
-        <!-- Islamabad -->
-        <div onclick="fillSearch('Islamabad')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-cyan-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">🏔️</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-cyan-400 transition-colors">Islamabad</span>
-            <span class="h-2 w-2 rounded-full bg-cyan-400 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">3 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Avg: Rs. 2,000</p>
-          </div>
-        </div>
-
-        <!-- Rawalpindi -->
-        <div onclick="fillSearch('Rawalpindi')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-violet-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">⚔️</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-violet-400 transition-colors">Rawalpindi</span>
-            <span class="h-2 w-2 rounded-full bg-violet-400 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">1 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Avg: Rs. 1,000</p>
-          </div>
-        </div>
-
-        <!-- Faisalabad -->
-        <div onclick="fillSearch('Faisalabad')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-pink-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">⚙️</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-pink-400 transition-colors">Faisalabad</span>
-            <span class="h-2 w-2 rounded-full bg-pink-400 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">1 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Avg: Rs. 1,000</p>
-          </div>
-        </div>
-
-        <!-- Peshawar -->
-        <div onclick="fillSearch('Peshawar')" class="bg-slate-950/40 border border-white/5 rounded-2xl p-4.5 hover:border-amber-500/40 hover:scale-[1.03] cursor-pointer transition-all flex flex-col justify-between h-36 relative overflow-hidden group">
-          <div class="absolute -right-3 -bottom-3 text-5xl opacity-[0.03] group-hover:scale-110 transition-transform duration-300">🏔️</div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-slate-400 tracking-wider uppercase group-hover:text-amber-400 transition-colors">Peshawar</span>
-            <span class="h-2 w-2 rounded-full bg-amber-500 pulse-ring"></span>
-          </div>
-          <div>
-            <p class="text-lg font-black text-white leading-none">0 Active</p>
-            <p class="text-[9px] font-semibold text-slate-500 mt-2">Offline Triaging</p>
-          </div>
+        <div class="flex gap-2">
+          <input id="chatInput" type="text" placeholder="Type your symptoms here..." class="input-field flex-1" />
+          <button id="btnChat" class="btn-primary px-5 py-2.5 rounded-xl font-semibold shadow-md">Send</button>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ── CYBER CLINICAL ASSESSMENT BANNER (Visible on search) ──────────────────── -->
-  <div id="analysisBanner" class="hidden max-w-7xl mx-auto px-6 mb-10 relative z-10">
-    <div class="bg-gradient-to-r from-violet-950/80 via-slate-900/90 to-cyan-950/80 border border-cyan-500/35 rounded-[1.8rem] rounded-tr-md p-6 shadow-2xl flex flex-col md:flex-row gap-6 items-stretch relative overflow-hidden">
-      <!-- Glow background inside analysis -->
-      <div class="absolute -left-20 -top-20 w-60 h-60 bg-cyan-500/10 rounded-full filter blur-2xl"></div>
-      
-      <div class="w-14 h-14 rounded-2xl bg-cyan-500/15 backdrop-blur-md flex items-center justify-center shrink-0 shadow-lg border border-cyan-500/20">
-        <span class="text-cyan-400 text-2xl">📋</span>
+    <!-- Right Col: Directory -->
+    <div class="lg:col-span-7 flex flex-col h-[700px]">
+      <div class="mb-4">
+        <h1 class="font-display text-3xl font-bold text-slate-900">Find a Specialist</h1>
+        <p class="text-sm text-slate-500 mt-1">Browse verified medical professionals.</p>
       </div>
-      
-      <div class="flex-1 space-y-1.5 z-10">
-        <h3 class="font-display font-extrabold text-cyan-400 text-[10px] tracking-widest uppercase">
-          AI Clinical Assessment Matrix
-        </h3>
-        <p class="text-slate-350 text-sm leading-relaxed font-semibold" id="bannerAdvice">—</p>
-      </div>
-      
-      <div class="flex border-t md:border-t-0 md:border-l border-white/10 pt-5 md:pt-0 md:pl-8 gap-8 justify-between text-center shrink-0 z-10">
-        <div class="flex flex-col justify-center">
-          <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Urgency Node</p>
-          <div>
-            <span id="bannerUrgency" class="px-4.5 py-2 rounded-xl text-xs font-black tracking-widest uppercase shadow-md">
-              —
-            </span>
-          </div>
-        </div>
-        <div class="flex flex-col justify-center">
-          <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Sector Routing</p>
-          <p class="text-sm font-black text-cyan-400" id="bannerSpec">—</p>
+
+      <div class="glass-card p-5 mb-6">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input id="searchQuery" type="text" placeholder="Search doctors, specializations, or conditions..." class="input-field flex-1" />
+          <button id="btnSearch" class="btn-primary px-6 py-2.5 rounded-xl font-semibold shadow-md whitespace-nowrap">Search</button>
+          <button id="btnNearMe" class="btn-secondary px-4 py-2.5 rounded-xl font-semibold whitespace-nowrap">📍 Near Me</button>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ── MAIN DOCTOR GRID / RESULTS ─────────────────────────────────────────── -->
-  <main class="max-w-7xl mx-auto px-6 pb-28 relative z-10 font-sans">
-    <div class="flex items-center justify-between mb-10 pb-4 border-b border-white/5">
-      <h2 id="resultsHeading" class="font-display text-2xl font-extrabold text-white tracking-tight">
-        Available Practitioners & Specialists
-      </h2>
-      <span id="resultCount" class="text-xs font-extrabold text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 px-3 py-1.5 rounded-xl shadow-md"></span>
+      <div id="docResults" class="flex-1 overflow-y-auto space-y-4 pr-2 pb-10">
+        <!-- JS populates this -->
+      </div>
     </div>
 
-    <!-- Skeleton Loader -->
-    <div id="skeletonGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="skeleton h-64 w-full shadow-sm"></div>
-      <div class="skeleton h-64 w-full shadow-sm"></div>
-      <div class="skeleton h-64 w-full shadow-sm"></div>
-    </div>
-
-    <!-- Live Grid -->
-    <div id="doctorGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Injected Dynamically by JS -->
-    </div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="hidden text-center py-24 bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl max-w-xl mx-auto mt-6">
-      <p class="text-6xl mb-4">🩺</p>
-      <p class="font-display text-xl font-extrabold text-white">No active nodes match your query</p>
-      <p class="text-xs text-slate-400 mt-2 max-w-xs mx-auto leading-relaxed">Try typing a simpler symptom like "chest pain", "sugar levels", or "child fever".</p>
-    </div>
   </main>
 
-  <!-- ── CYBER CLINICAL FLOATING WIDGET (SPECTACULAR NEON RESKIN) ──────────────── -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
-    <!-- Chat Window Container -->
-    <div id="triageChatWindow" class="hidden w-[360px] h-[520px] bg-slate-950/90 border border-white/15 flex flex-col overflow-hidden mb-4 shadow-2xl transition-all rounded-[2rem] rounded-tr-md">
-      <!-- Chat Header -->
-      <div class="bg-gradient-to-r from-violet-900 via-slate-900 to-cyan-950 text-white px-5 py-4.5 flex items-center justify-between shadow-sm relative border-b border-white/5">
-        <div class="absolute -right-5 -bottom-5 w-24 h-24 bg-cyan-500/5 rounded-full filter blur-xl"></div>
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-xl shadow-inner select-none">🤖</div>
-          <div>
-            <h4 class="font-extrabold text-xs leading-none tracking-widest uppercase text-white">Smart Doctor AI</h4>
-            <span class="text-[9px] text-cyan-400 flex items-center gap-1.5 mt-1.5 font-bold">
-              <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 block animate-pulse"></span>
-              Active Clinical Receptionist
-            </span>
-          </div>
-        </div>
-        <button onclick="toggleTriageChat()" class="text-slate-450 hover:text-white text-3xl font-light leading-none transition-colors">&times;</button>
-      </div>
-
-      <!-- Messages Area -->
-      <div id="triageChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3.5 flex flex-col bg-slate-900/60">
-        <!-- Message bubbles appended here -->
-      </div>
-
-      <!-- Footer Inputs -->
-      <div class="p-4.5 border-t border-white/5 bg-slate-950">
-        <!-- Name Form Area (shown first) -->
-        <div id="triageNameFormArea" class="mb-3">
-          <input id="triagePatientName" type="text" placeholder="Please enter your name *" 
-            class="w-full border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold outline-none bg-slate-900 text-white focus:border-cyan-500/40 shadow-inner focus:shadow-cyan-900/10 transition-all" />
-        </div>
-        <!-- Input fields -->
-        <div class="flex gap-2.5 items-center">
-          <textarea id="triageMessage" placeholder="Describe symptoms or ask receptionist..." 
-            class="flex-1 border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold outline-none bg-slate-900 text-white focus:border-cyan-500/40 shadow-inner focus:shadow-cyan-900/10 resize-none h-11 transition-all" rows="1"></textarea>
-          <button onclick="sendTriageMessage()" 
-            class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold px-4.5 py-3.5 rounded-xl text-xs transition-colors flex items-center justify-center shadow-md shrink-0">
-            Send
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Floating Chat Trigger Button -->
-    <button onclick="toggleTriageChat()" 
-      class="bg-gradient-to-r from-violet-650 via-slate-900 to-cyan-650 text-white font-bold p-5 rounded-full hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 relative border border-cyan-500/35">
-      <span class="text-2xl">🤖</span>
-      <span class="text-xs font-black tracking-widest uppercase pr-1.5 select-none">Ask AI Receptionist</span>
-      <span id="triageChatBadge" class="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-cyan-400 border-2 border-slate-950 animate-pulse"></span>
-    </button>
-  </div>
-
-  <!-- ── CYBER APPOINTMENT BOOKING MODAL ─────────────────────────────────────── -->
-  <div id="bookingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-md">
-    <div class="bg-slate-900 rounded-[2rem] rounded-tr-md shadow-2xl w-full max-w-md p-6 relative border border-white/10">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-3xl leading-none transition-colors">&times;</button>
-      
-      <div class="flex items-center gap-3.5 mb-5 border-b border-white/5 pb-3">
-        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl shadow-inner">📅</div>
-        <div>
-          <h3 class="font-display font-extrabold text-base text-white leading-none">Confirm Routing</h3>
-          <p class="text-xs text-cyan-400 font-bold mt-1.5" id="modalDoctorName">—</p>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Full Name *</label>
-          <input id="bookPatientName" type="text" placeholder="e.g. Hammad Ahmed" class="input-field" />
-        </div>
-        <div>
-          <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Contact Number *</label>
-          <input id="bookPatientContact" type="tel" placeholder="e.g. +92 300 1234567" class="input-field" />
-        </div>
-        <div>
-          <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Email Address *</label>
-          <input id="bookPatientEmail" type="email" placeholder="e.g. patient@gmail.com" class="input-field" />
-        </div>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Date</label>
-            <input id="bookDate" type="date" class="input-field" />
-          </div>
-          <div>
-            <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Available Slot</label>
-            <select id="bookTimeSlot" class="input-field text-slate-400 font-bold">
-              <option value="">Select slot…</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1">
-          <div>
-            <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Consultation Type</label>
-            <select id="bookConsultType" class="input-field font-semibold text-slate-400">
-              <option value="online">Online Consultation (Video/Call)</option>
-              <option value="in_person">In-Person Visit (Clinic)</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Brief Description</label>
-          <textarea id="bookSymptoms" placeholder="Optionally describe symptoms for the doctor..." class="input-field resize-none h-16"></textarea>
-        </div>
-      </div>
-
-      <button onclick="submitBooking()"
-        class="mt-6 w-full btn-neon-cyan text-white font-black py-4 rounded-2xl transition-all text-xs tracking-widest uppercase shadow-lg">
-        Confirm Real-time Appointment
-      </button>
-    </div>
-  </div>
-
-  <!-- ── TOAST NOTIFICATION ──────────────────────────────────────────────────── -->
-  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50
-       bg-slate-900 text-white text-xs font-bold px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-800">
-  </div>
-
-  <!-- Styled Input Fields for Forms -->
-  <style>
-    .input-field {
-      width: 100%;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 0.65rem 0.85rem;
-      font-size: 0.775rem;
-      font-weight: 600;
-      outline: none;
-      color: #f1f5f9;
-      background-color: rgba(9, 11, 17, 0.6);
-      transition: all 0.2s ease;
-    }
-    .input-field:focus {
-      border-color: rgba(6, 182, 212, 0.4);
-      background-color: rgba(9, 11, 17, 0.8);
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
-    }
-  </style>
-
-  <!-- JS Dependencies -->
   <script src="/js/app.js"></script>
   <script src="/js/search.js"></script>
-  <script src="/js/booking.js"></script>
   <script src="/js/triage-chat.js"></script>
 </body>
 </html>

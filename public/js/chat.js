@@ -275,20 +275,20 @@ function displayAgentRecommendations(matchData) {
   if (!container) return;
 
   const bubble = document.createElement("div");
-  bubble.className = "self-start bg-cyan-900/40 text-cyan-50 rounded-[1.2rem] rounded-tl-sm px-4 py-3 max-w-[85%] shadow-md border border-cyan-500/20";
+  bubble.className = "self-start bg-brand-50 border border-brand-100 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] shadow-sm";
   
   let docsHtml = matchData.doctors.map(d => {
-    return `<div class="bg-slate-950/60 p-2 rounded-xl mt-2 border border-white/5">
-      <p class="text-xs font-bold text-white">${d.name}</p>
-      <p class="text-[9px] text-cyan-400">${d.specialization} • ${d.location}</p>
+    return `<div class="bg-white p-3 rounded-xl mt-2 border border-slate-200 shadow-sm">
+      <p class="text-sm font-bold text-slate-900">${d.name}</p>
+      <p class="text-xs font-medium text-brand-600">${d.specialization} • ${d.location}</p>
     </div>`;
   }).join("");
 
   bubble.innerHTML = `
     <div class="flex items-center gap-1.5 mb-1.5">
-      <span class="text-[10px] font-black tracking-widest uppercase text-cyan-400">Agent Specialist Matching</span>
+      <span class="text-[10px] font-bold tracking-widest uppercase text-brand-600">Agent Specialist Matching</span>
     </div>
-    <p class="text-xs leading-relaxed mb-2">${matchData.reasoning}</p>
+    <p class="text-sm leading-relaxed mb-2 text-slate-700">${matchData.reasoning}</p>
     ${docsHtml}
   `;
   
